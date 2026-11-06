@@ -6,6 +6,15 @@ Simple interface to access all functionality
 import sys
 import subprocess
 import os
+from pathlib import Path
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+BASE_DIR = Path(__file__).resolve().parent
 
 def show_help():
     """Show usage instructions"""
@@ -38,8 +47,8 @@ def predict_genre(description):
     """Predict genre using the final model"""
     try:
         result = subprocess.run([
-            sys.executable, 'predict_final.py', description
-        ], capture_output=True, text=True, check=True)
+            sys.executable, str(BASE_DIR / 'predict_final.py'), description
+        ], capture_output=True, text=True, check=True, encoding='utf-8')
         print(result.stdout)
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
@@ -51,7 +60,7 @@ def launch_web():
         print("🌐 Launching web interface...")
         print("📍 URL: http://localhost:8501")
         print("⏹️  Press Ctrl+C to stop")
-        subprocess.run([sys.executable, '-m', 'streamlit', 'run', 'app.py'])
+        subprocess.run([sys.executable, '-m', 'streamlit', 'run', str(BASE_DIR / 'app.py')])
     except KeyboardInterrupt:
         print("\n👋 Web interface stopped")
     except Exception as e:
@@ -63,7 +72,7 @@ def train_model():
     try:
         print("🔄 Training model...")
         result = subprocess.run([
-            sys.executable, 'final_improved_model.py'
+            sys.executable, str(BASE_DIR / 'final_improved_model.py')
         ], check=True)
         print("✅ Model training complete!")
     except subprocess.CalledProcessError as e:

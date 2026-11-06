@@ -39,16 +39,14 @@ venv.bak/
 .ipynb_checkpoints
 
 # Data files
-data/raw_books.csv
-data/processed_books.csv
-data/*.csv
-data/*.json
-data/*.pkl
+data/*
+!data/final_books.csv
+!data/.gitkeep
 
 # Model files
-models/
-*.pkl
-*.joblib
+models/*
+!models/final_model.pkl
+!models/.gitkeep
 
 # Results
 results/

@@ -4,18 +4,28 @@ Use the final improved model for accurate predictions
 
 import pickle
 import sys
+from pathlib import Path
 
-def predict_genre(description):
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "final_model.pkl"
+
+def predict_genre(description, model_path=MODEL_PATH):
     """Predict genre using the final improved model"""
     try:
         # Load the final model
-        with open('models/final_model.pkl', 'rb') as f:
+        with open(model_path, 'rb') as f:
             model = pickle.load(f)
         
         # Make prediction
         prediction = model.predict([description])[0]
         probabilities = model.predict_proba([description])[0]
-        confidence = max(probabilities)
+        confidence = float(max(probabilities))
         
         return prediction, confidence
         

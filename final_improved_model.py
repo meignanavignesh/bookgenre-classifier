@@ -2,6 +2,9 @@
 Create the final improved model with very specific keyword-based training
 """
 
+import os
+import sys
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -10,6 +13,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 import pickle
 import logging
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+MODELS_DIR = BASE_DIR / "models"
+DATA_FILE = DATA_DIR / "final_books.csv"
+MODEL_FILE = MODELS_DIR / "final_model.pkl"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -295,7 +310,9 @@ def train_final_model():
     logger.info(f"Genre distribution:\n{df['genre'].value_counts()}")
     
     # Save dataset
-    df.to_csv('data/final_books.csv', index=False)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    df.to_csv(DATA_FILE, index=False)
     
     # Create pipeline with better parameters
     pipeline = Pipeline([
@@ -337,10 +354,10 @@ def train_final_model():
     logger.info(f"Test accuracy: {test_score:.4f}")
     
     # Save model
-    with open('models/final_model.pkl', 'wb') as f:
+    with open(MODEL_FILE, 'wb') as f:
         pickle.dump(pipeline, f)
     
-    logger.info("Final model saved!")
+    logger.info(f"Final model saved to {MODEL_FILE}!")
     
     return pipeline, test_score
 
@@ -348,7 +365,7 @@ def test_final_model():
     """Test the final model"""
     
     # Load model
-    with open('models/final_model.pkl', 'rb') as f:
+    with open(MODEL_FILE, 'rb') as f:
         model = pickle.load(f)
     
     # Test cases
